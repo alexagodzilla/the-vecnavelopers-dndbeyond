@@ -3,93 +3,168 @@
 <head>
   <meta charset="UTF-8">
   <title>Name Pic Description</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: linear-gradient(to bottom right, #222, #2d0943, #570404);
+      margin: 0;
+      padding: 0;
+      color: #fff;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 50px auto;
+      background: rgba(0, 0, 0, 0.6);
+      padding: 20px;
+      border-radius: 8px;
+      margin-top: 120px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #fff;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 8px;
+      color: #fff;
+    }
+
+    input[type="text"], textarea {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #B30404;
+      border-radius: 4px;
+      box-sizing: border-box;
+      background-color: #fffaf0;
+      color: #B30404;
+    }
+
+    .btn {
+      display: inline-block;
+      background-color: #B30404;
+      color: #fff;
+      border: none;
+      padding: 12px 25px;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+      text-decoration: none;
+      width: 200px;
+      text-align: center;
+      margin: 5px;
+      box-sizing: border-box;
+    }
+
+    .btn:hover {
+      background-color: #ff4d4d;
+    }
+
+    .btn-container {
+      text-align: center;
+      margin: 20px 0;
+    }
+
+    #output {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    #output img {
+      max-width: 200px;
+      height: auto;
+      border-radius: 8px;
+      margin-top: 10px;
+    }
+  </style>
 </head>
 <body>
-<div th:insert="fragments/nav :: navigation"></div>
-<div>
-  <div>
-    <label for="character-name"> Choose a name for your Character: </label>
-    <input type="text" id="character-name" th:value="${characterName}"/>
+<div class="container">
+  <h1>Create Your Character</h1>
+  <div th:insert="fragments/nav :: navigation"></div>
+  <div class="form-group">
+    <label for="character-name">Choose a name for your Character:</label>
+    <input type="text" id="character-name" th:value="${characterName}" />
   </div>
-  <div>
-    <label for="character-pic-url"> Add an url pic for your Character: </label>
-    <input type="text" id="character-pic-url" th:value="${characterPicUrl}"/>
+  <div class="form-group">
+    <label for="character-pic-url">Add a URL for your Character's picture:</label>
+    <input type="text" id="character-pic-url" th:value="${characterPicUrl}" />
   </div>
-  <div>
-    <label for="character-description"> Character description: </label>
-    <input type="text" id="character-description" th:value="${characterDescription}"/>
+  <div class="form-group">
+    <label for="character-description">Character description:</label>
+    <input type="text" id="character-description" th:value="${characterDescription}" />
   </div>
-
-  <button id="save-button">Save</button>
-
-
-
-  <div id="output" style="margin-top: 20px;">
-
+  <div class="btn-container">
+    <button id="save-button" class="btn">Save Character</button>
+    <button id="goToAbilityScores" class="btn">Go Back</button>
   </div>
-  <button id="goToAbilityScores">Go to Ability Scores</button>
-  <script>
-    // Wait for the DOM content to load
-    document.addEventListener("DOMContentLoaded", function() {
-        // Get references to the button and input fields
-        const saveButton = document.getElementById("save-button");
-        const nameInput = document.getElementById("character-name");
-        const picInput = document.getElementById("character-pic-url");
-        const descriptionInput = document.getElementById("character-description");
-        const outputDiv = document.getElementById("output");
-        const characterId = [[${characterId}]];
-
-        // Add event listener to the Save button
-        saveButton.addEventListener("click", function() {
-            // Get the input values
-            const name = nameInput.value;
-            const picUrl = picInput.value;
-            const description = descriptionInput.value;
-            submit({
-                "name": name,
-                "picUrl": picUrl,
-                "description": description
-            });
-
-
-            // Display the values dynamically in the output area
-            outputDiv.innerHTML = `
-                <h2>${name}</h2>
-                <img src="${picUrl}" alt="${name}" style="max-width: 200px; height: auto;"/>
-                <p>${description}</p>
-            `;
-        });
-        document.getElementById("goToAbilityScores").addEventListener("click", function() {
-            window.location.href = `/abilityScores/${characterId}`;
-        });
-    });
-    function submit(details) {
-
-        fetch(`/characterDetails/[[${characterId}]]`, {
-            method: 'PATCH', // HTTP method
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(details)
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-             return response.json();
-        }).then(data => {
-            if (data.redirectUrl) {
-                window.location.href = data.redirectUrl;
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert("An error occurred while saving the data.");
-        });
-    }
-  </script>
-
-
+  <div id="output"></div>
 </div>
+<script>
+  // Wait for the DOM content to load
+  document.addEventListener("DOMContentLoaded", function () {
+    const saveButton = document.getElementById("save-button");
+    const nameInput = document.getElementById("character-name");
+    const picInput = document.getElementById("character-pic-url");
+    const descriptionInput = document.getElementById("character-description");
+    const outputDiv = document.getElementById("output");
+    const characterId = [[${characterId}]];
+
+    saveButton.addEventListener("click", function () {
+      const name = nameInput.value;
+      const picUrl = picInput.value;
+      const description = descriptionInput.value;
+
+      submit({
+        name: name,
+        picUrl: picUrl,
+        description: description
+      });
+
+      outputDiv.innerHTML = `
+          <h2>${name}</h2>
+          <img src="${picUrl}" alt="${name}" />
+          <p>${description}</p>
+        `;
+    });
+
+    document.getElementById("goToAbilityScores").addEventListener("click", function () {
+      window.location.href = `/abilityScores/${characterId}`;
+    });
+  });
+
+  function submit(details) {
+    fetch(`/characterDetails/[[${characterId}]]`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(details)
+    })
+            .then((response) => {
+              if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+              }
+              return response.json();
+            })
+            .then((data) => {
+              if (data.redirectUrl) {
+                window.location.href = data.redirectUrl;
+              }
+            })
+            .catch((error) => {
+              console.error("Error:", error);
+              alert("An error occurred while saving the data.");
+            });
+  }
+</script>
 </body>
 </html>
